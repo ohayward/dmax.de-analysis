@@ -1,0 +1,17 @@
+actor User
+boundary Client
+entity Sonic
+title Remove Favourite Sequence
+note over User,Client: UX: Anonymous User\nUX: Registration\nUX: Login\nUX: Login with Facebook
+==LoggedIn==
+Client->Client: attribute(isFavorite==true)
+opt Remove Favorite
+User->Client: click(removeFavorite)
+Client->Sonic: deleteFavorite(id)
+alt Missing Resource
+Sonic ->Client: error(missing.resource)
+Client->User: display(error)
+else Success
+Sonic ->Client: success()
+Client->User: display(success)
+end
