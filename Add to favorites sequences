@@ -1,0 +1,23 @@
+actor User
+boundary Client
+entity Sonic
+title Add Favourite Sequence
+note over User,Client: UX: Anonymous User\nUX: Registration\nUX: Login\nUX: Login with Facebook
+==LoggedIn==
+Client->User:display(show)
+Client->Client: attribute(isFavorite==false)
+alt already favorited
+	Client->User:display(favorited)
+	note over User,Client: UX: Remove Favorites
+else Add to Favorites
+		Client->User: 		display(addToFavorites)
+		User->Client: 		[id]click(addToFavorites)
+		Client ->Sonic: addFavorite(id)
+		alt Missing Resource
+			Sonic ->Client: 		response(error=missing.resource)
+			Client->User: display(error)
+			else Success
+            	Sonic ->Client: response(success)
+	Client->User: display(success)
+		end 
+end
