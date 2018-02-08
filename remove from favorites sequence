@@ -4,14 +4,15 @@ entity Sonic
 title Remove Favourite Sequence
 note over User,Client: UX: Anonymous User\nUX: Registration\nUX: Login\nUX: Login with Facebook
 ==LoggedIn==
+note over User,Client: UX: Add Favorites
+Client->User:display(show)
 Client->Client: attribute(isFavorite==true)
-opt Remove Favorite
-User->Client: click(removeFavorite)
+User->Client:click(removefromFavorites)
 Client->Sonic: deleteFavorite(id)
 alt Missing Resource
-Sonic ->Client: error(missing.resource)
-Client->User: display(error)
+		Sonic ->Client:response(error=missing.resource)
+		Client->User: display(error)
 else Success
-Sonic ->Client: success()
-Client->User: display(success)
+            	Sonic->Client: response(success)
+				Client->User: display(success)
 end
