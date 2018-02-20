@@ -1,0 +1,7 @@
+title Dplay retention
+User->Dplay:Terminates subscription
+User<--Sonic:Sends email offering "free month" trial to Dplay
+User->Dplay:Activates account
+Dplay->Bam:Provides email
+User<--Bam:Sends voucher email
+User->ES:Signs up
