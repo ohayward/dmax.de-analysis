@@ -1,0 +1,43 @@
+title Login Sequence
+actor User
+boundary Client
+entity Sonic
+opt
+User->Client: click(login)
+end
+Client->User: display(enterEmailPassword)
+opt Cancel Journey
+User->Client: click(cancel)
+end
+alt Redirect from Registration
+Client->Client: input(emailAddress)
+else Clean Login
+User->Client:input(emailAddress)
+end 
+Client->Client:validateEmailFormat(emailAddress)
+alt Invalid email format
+Client->User: display(error)
+end
+User->Client:input(password)
+opt Toggle Password Visibility
+User->Client: click(displayPassword)
+Client ->User: display(password)
+end 
+loop 
+Client->Client:existPassword(boolean)
+alt Password Exist=false
+Client->User: display(error)
+else Password Exists=true
+Client-> User: display(submit)
+User->Client: click(submit)
+Client-> Sonic: login(credentials)
+end
+alt Incorrect password for username
+Sonic->Client: error(unauthorized)
+Client->User:display(error)
+note over User,Client: **UX:Password Reset**
+end
+Sonic->Client: return(token)
+Client->Client: store(token)
+Client->User: display(homepage)
+note over User,Client: UX:Logout\nUX:Connect to Facebook\nUX:Update User Profile\nUX:Back to Origin Page
