@@ -1,0 +1,86 @@
+actor User
+boundary Client
+entity Sonic
+
+title Registration Sequence
+Client->User: display(registration)
+note over User,Client: UX:Login with Facebook
+User->Client: click(registration)
+Client->User: display(registrationForm)
+opt
+User->Client:click(cancel)
+note over Client: UX:Back to Origin Page
+end
+User->Client: input(emailAddress)
+Client->Client:validateEmailFormat(emailAddress)
+alt Invalid format Email address
+Client->User: display(error)
+end
+User->Client: input(firstName)
+User->Client: input(lastName)
+opt
+User->Client: input(yearOfBirth)
+Client->Client: validateYearOfBirth(yearOfBirth)
+alt Year of Birth
+Client->User: display(error)
+end
+end
+opt 
+User->Client: input(gender)
+User->Client: input(emailPreferences)
+note over User, Client: UX: Add Favorites //Anon user has history!!//
+end
+User->Client: input(password)
+opt Toggle Password Visibility
+User->Client: click(displayPassword)
+Client ->User: display(password)
+end
+User->Client: input(repeatPassword)
+
+loop Password Process
+Client->Client:existPassword(boolean)
+alt Password Exist=false
+Client->User: display(error)
+else Password Exists=True
+Client->Client: checkLength(password)
+alt Min. Password Length <8 char
+Client->User: display(error)
+end
+Client ->Client: match(password,repeatPassword)
+alt Passwords Not Match
+Client->User: display(error)
+else Passwords Match
+  User->Client: input(acceptTsCs)
+  Client->Client: existAcceptTsCs(boolean)
+  alt AcceptTsCs Exist=false
+  Client ->User: display(error)
+  else AcceptTsCs=true
+  Client->User: display(submit)
+   User->Client: click(submit)
+  end
+  Client->Sonic: registerAndLogin(username,password) 
+  alt Email exists
+  Sonic->Client:error(invalid.payload)
+  Client ->User: display(error)
+  note over User, Client: UX:Login
+  else Password complexity fail
+  Sonic ->Client: error(invalid.password)
+  Client ->User: display(error)
+  Client ->Client: clearPassword(password,repeatPassword)
+  end
+end
+end
+end
+Sonic ->Client: return(token)
+Client ->Client: store(token)
+Client ->Sonic: customAttributes(acceptTsCs:datetime)
+Client ->Sonic: patchProfiles(birthYear,gender)
+opt Update Profile & Favorites
+Client ->Sonic: patchUserMe(newsletterPreference)
+end 
+Client ->User: display(registrationSuccess)
+Client ->Sonic: sendValidationEmail(token)
+note over Sonic: //New Requirement: Support email \nverification w/o initiate call//
+Sonic-->*Email: <<create>>
+Email->User: mailTo(emailAddress)
+note over User, Client: UX: Verify Email Address
