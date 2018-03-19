@@ -1,1 +1,19 @@
-
+  actor User
+boundary Client
+entity Sonic
+title Consent Management
+   Client->Sonic: get(consent)
+   Sonic->Client: consent()
+   Client->User: display(consent)
+  User->Client: input(acceptTsCs)
+	opt
+User->Client:input(emailPreferences)
+end
+  Client->Client: existAcceptTsCs(boolean)
+  alt AcceptTsCs Exist=false
+  Client ->User: display(error)
+  else AcceptTsCs=true
+  Client->User: display(submit)
+   User->Client: click(submit)
+   Client->Sonic: put(consent)
+  end
